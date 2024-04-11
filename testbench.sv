@@ -89,3 +89,27 @@ class monitor;
     end
   endtask
 endclass
+
+class scoreboard;
+  transaction tr;
+  mailbox #(transaction) mbx;
+  //virtual dff_if vif;
+  
+  event sconext;
+  
+  function new(mailbox #(transaction) mbx);
+    this.mbx = mbx;
+  endfunction
+  
+  task run();
+    forever begin
+      mbx.get(tr);
+      tr.display("SCO");
+      if (tr.din == tr.dout)
+        $display("Data Matched");
+      else
+        $display("Data Mismatched");
+      ->sconext;
+    end
+  endtask
+endclass
