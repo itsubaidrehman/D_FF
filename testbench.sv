@@ -66,3 +66,26 @@ class driver;
     end
   endtask
 endclass
+
+class monitor;
+  transaction tr;
+  mailbox #(transaction) mbx;
+  virtual dff_if vif;
+  
+  function new(mailbox #(transaction) mbx);
+    this.mbx = mbx;
+    
+  endfunction
+  
+  task run();
+    tr = new();
+    forever begin
+      @(posedge vif.clk);
+      @(posedge vif.clk);
+      tr.din <= vif.din;
+      tr.dout <= vif.dout;
+      mbx.put(tr);
+      tr.display("Mon");
+    end
+  endtask
+endclass
